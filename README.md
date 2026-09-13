@@ -6,9 +6,18 @@
 
 | 용도 | URL / 상태 |
 | --- | --- |
-| 외부 공유용 사이트 | 배포 전 — 배포 성공 후 발급된 Render URL을 기록합니다. |
+| 외부 공유용 사이트 | [https://sound-pocket.onrender.com](https://sound-pocket.onrender.com) |
 | 로컬 미리보기 | http://127.0.0.1:8765/ (이 PC에서만 접속 가능) |
-| 배포 관리 | https://dashboard.render.com/ |
+| 배포 관리 | [Render 서비스 관리](https://dashboard.render.com/web/srv-daj8fe8jo6nc73cs8pqg) |
+| 비공개 소스 저장소 | [starzzangna/sound-pocket](https://github.com/starzzangna/sound-pocket) |
+
+## 현재 배포 상태 (2026-09-13)
+
+Render Singapore의 **Free** 웹 서비스로 배포했습니다. 비밀번호 없이 접속되며 페이지, 상태 확인, API, 정적 파일에서 HTTP 200 및 검색 제외 헤더를 확인했습니다.
+
+**현재 Render 서버에서는 YouTube 다운로드가 제한되어 실제 변환 테스트가 실패했습니다.** 공개 테스트 영상 `YE7VzlLtp-4`는 로컬에서 192kbps MP3 생성과 다운로드에 성공했지만, Render에서는 YouTube 요청 제한 오류가 발생했습니다. 사이트 배포는 완료되었으나 온라인 변환 기능의 정상 사용은 확인되지 않았습니다. 재시도만으로 해결된다고 보장할 수 없으며, 지속되면 변환 작업을 개인 PC에서 실행하는 등 실행 환경 변경이 필요합니다. 유료 프록시나 추가 유료 서비스는 연결하지 않았습니다.
+
+현재 서비스는 GitHub `main` 브랜치의 Dockerfile로 자동 배포됩니다. `/healthz` 상태 확인과 Render에서 생성한 `SECRET_KEY`를 사용합니다. README만 수정할 때 커밋 메시지에 `[skip render]`를 넣으면 불필요한 재배포를 건너뜁니다.
 
 ## 검색 노출 제외
 
