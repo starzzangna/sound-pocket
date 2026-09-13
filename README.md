@@ -67,9 +67,34 @@ WebView2가 없는 PC는 [Microsoft 공식 페이지](https://developer.microsof
 
 화면은 pywebview로 표시하고, 내부 Flask/Waitress 서비스는 `127.0.0.1`의 임의 포트에만 연결합니다. 외부에 공개되는 공유 URL은 없습니다. 앱 종료 후에는 내부 주소도 사용할 수 없습니다.
 
+## 구현 구조
+
+```mermaid
+flowchart LR
+    UI[pywebview 앱 화면] --> API[Flask / Waitress]
+    API --> Manager[ConversionManager]
+    Manager --> Worker[별도 작업 프로세스]
+    Worker --> YT[yt-dlp 다운로드]
+    YT --> FF[FFmpeg MP3 변환]
+    FF --> Temp[PC 임시 파일]
+    Temp --> Save[사용자가 선택한 위치에 저장]
+```
+
+| 구성 | 구현 방식 |
+| --- | --- |
+| 화면 | HTML·CSS·JavaScript를 pywebview와 Windows WebView2로 표시 |
+| 내부 API | Flask/Waitress를 `127.0.0.1`의 임의 포트에서 실행 |
+| 작업 관리 | 메모리에서 진행 상태 관리, 앱 인스턴스당 한 작업으로 제한 |
+| 다운로드·변환 | 별도 프로세스에서 yt-dlp와 FFmpeg 실행. 이벤트를 통해 진행 상태 전달 |
+| 취소·종료 | 실행 중 작업 프로세스 트리를 종료하고 임시 작업 정리 |
+| 요청 보호 | 로컬 Host 검사, 세션별 CSRF 토큰, YouTube 주소 검증 |
+| 배포 | PyInstaller로 실행 파일·의존성·Node.js·FFmpeg를 묶어 ZIP 생성 |
+
+각 PC에서 화면과 작업 처리가 함께 실행됩니다. 중앙 변환 서버, 사용자 계정 데이터베이스, 자동 업데이트 서비스는 사용하지 않습니다.
+
 ## 개발 환경에서 실행
 
-빌드·개발 PC에는 **Python 3.12 x64와 Node.js**가 필요합니다. 검증에 사용한 Node.js 버전은 `26.7.0`입니다. 저장소 루트에서 다음 명령을 실행하세요.
+빌드·개발 PC에는 **Python 3.12 x64와 Node.js**가 필요합니다. 저장소 루트에서 다음 명령을 실행하세요.
 
 ```powershell
 python -m venv .venv
@@ -117,8 +142,6 @@ Get-Content artifacts\desktop-smoke.json
 
 기본 실행 파일 검증은 로컬 HTTP 응답, Host 검사, CSRF 방어, 포함된 Node.js 실행, 실제 FFmpeg 인코딩, 임시 작업 정리를 확인합니다. YouTube 다운로드까지 검증하려면 `-ArgumentList` 문자열 끝에 `--test-video <권한이 있는 공개 영상 URL>`을 추가하세요.
 
-**2026-09-13 검증 결과:** 자동 테스트 13개 통과. 완성된 Windows 실행 파일에서 공개 테스트 영상 `YE7VzlLtp-4`를 192kbps MP3 **14,317,100바이트**로 변환하고, 다운로드한 파일 전체를 디코딩하는 데 성공했습니다. 이후 PC용 입력 화면과 변환 완료·다운로드 표시도 확인했습니다. 이 결과가 모든 영상이나 다른 PC의 YouTube 접근 성공을 보장하지는 않습니다.
-
 ## 문제 해결
 
 | 증상 | 확인할 내용 |
@@ -145,8 +168,8 @@ YouTube 변경에 대응해 다운로드 도구를 업데이트할 때는 `requi
 | `requirements-desktop.lock` | PC 앱·빌드 환경 의존성 버전 |
 | `tests/` | API·작업 관리·오디오·오류 처리 테스트 |
 
-## 기존 웹 서비스 종료
+## 관련 문서
 
-Render 기반 웹 서비스는 PC 앱으로 전환하면서 종료했습니다. 배포 서비스와 GitHub·Google 연동을 해제했고 Render 계정도 탈퇴했습니다. **현재 운영 중인 Render 사이트나 자동 배포 연결은 없습니다.** GitHub 비공개 저장소는 소스 보관용으로 유지합니다.
-
-`Dockerfile`, `render.yaml`, `serve.py`, `requirements.lock`은 이전 웹 서버 구성 파일로 남아 있으며, 현재 PC 앱 실행에는 필요하지 않습니다.
+- [사용 안내](DESKTOP_README.txt)
+- [개발·운영 이력](HISTORY.md)
+- [외부 구성요소 및 라이선스](THIRD_PARTY_NOTICES.md)
