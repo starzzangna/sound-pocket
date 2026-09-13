@@ -19,6 +19,12 @@ Render Singapore의 **Free** 웹 서비스로 배포했습니다. 비밀번호 �
 
 현재 서비스는 GitHub `main` 브랜치의 Dockerfile로 자동 배포됩니다. `/healthz` 상태 확인과 Render에서 생성한 `SECRET_KEY`를 사용합니다. README만 수정할 때 커밋 메시지에 `[skip render]`를 넣으면 불필요한 재배포를 건너뜁니다.
 
+### 원인 진단 결과 (2026-09-13 20:46 KST)
+
+진단 수정본을 배포하고 같은 공개 영상을 한 번 재검증했습니다. Render 관리 로그에서 영상 정보 API의 `HTTP Error 403: Forbidden`과 최종 `Sign in to confirm you’re not a bot` 오류를 확인했습니다. 해당 실행에는 PO Token 누락 오류가 기록되지 않았습니다. 이는 봇 확인/인증 요구를 확인한 것이며 IP 평판만이 유일한 원인이라고 확정한 것은 아닙니다. 설치된 yt-dlp `2026.08.19`는 점검 시 공식 최신 안정 버전이며 Node.js도 인식됩니다.
+
+다운로드 도구의 원본 경고·오류는 URL 및 인증정보를 가린 뒤 Render의 비공개 Application logs에 기록합니다. 방문자에게는 봇 확인, 요청량 제한, PO Token, HTTP 403, 영상 접근 불가를 구분한 안내를 표시합니다. 요청 사이 1초, 다운로드 시작 전 5~10초 간격을 추가했지만 이번 봇 확인 오류는 해소되지 않았습니다. 자동 테스트 13개가 통과했으며 온라인 MP3 변환은 여전히 실패 상태입니다. 기존 접속 주소와 무료 플랜은 유지합니다.
+
 ## 검색 노출 제외
 
 HTML의 `robots` 메타 태그와 모든 응답(페이지, API, MP3 파일, 오류 응답)의 `X-Robots-Tag` 헤더에 `noindex, nofollow, nosnippet, noarchive`를 적용합니다. `robots.txt`는 크롤러가 `noindex`를 읽을 수 있도록 접근을 허용합니다. 사이트맵이나 검색엔진 등록은 사용하지 않습니다.
