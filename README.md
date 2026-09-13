@@ -1,5 +1,29 @@
 # Sound Pocket
 
+## Windows PC 앱 (권장)
+
+각 사용자의 PC에서 직접 YouTube 다운로드와 MP3 변환을 처리하는 Windows 10/11 x64 앱입니다. Render로 영상·오디오를 전송하지 않으며 각자 PC의 인터넷을 사용합니다. Python, Node.js, FFmpeg는 실행 패키지에 포함됩니다. Microsoft Edge WebView2 Runtime이 필요합니다.
+
+1. `SoundPocket-Windows-x64.zip` 전체를 압축 해제합니다.
+2. `SoundPocket/SoundPocket.exe`를 실행합니다. `_internal` 폴더를 함께 두세요.
+3. 영상 주소를 입력하고 변환 후 **MP3 다운로드**를 눌러 저장 위치를 선택합니다.
+
+앱을 닫으면 진행 중 작업이 취소되고 정상 종료 시 임시 파일을 정리합니다. 사용자가 따로 저장한 MP3는 삭제하지 않습니다. 앱이 실행되는 동안 임시 완료 파일은 15분 보관됩니다. 강제 종료 시에는 `%LOCALAPPDATA%\\SoundPocket`에 임시 파일이 남을 수 있습니다. 서버 비용과 앱 로그인은 없습니다. YouTube의 접근 제한을 영구적으로 해제하는 기능은 아닙니다.
+
+**실행 파일 검증:** 패키지에 포함된 Node.js와 FFmpeg를 사용해 공개 테스트 영상 `YE7VzlLtp-4`를 192kbps MP3(14,317,100바이트)로 변환하고, 로컬 HTTP 다운로드 및 전체 오디오 디코딩에 성공했습니다. 임시 작업 정리와 로컬 Host 검증·CSRF 거부도 확인했습니다.
+
+빌드 PC에서 재생성:
+
+```powershell
+python -m venv .venv
+.\\.venv\\Scripts\\python.exe -m pip install -r requirements-desktop.lock
+.\\.venv\\Scripts\\python.exe build_desktop.py
+```
+
+빌드 PC에는 Node.js가 필요합니다. 결과는 `dist/SoundPocket` 및 상위 `output/SoundPocket-Windows-x64.zip`입니다. 앱은 코드 서명되지 않았습니다. 구성요소 고지와 라이선스는 ZIP의 `licenses` 폴더에 포함합니다. 자세한 사용법은 `DESKTOP_README.txt`를 확인하세요.
+
+아래는 기존 Render 웹 서비스의 설정과 진단 기록입니다. 이 웹 주소에 접속하는 것만으로 PC 앱이 실행되지는 않습니다.
+
 비밀번호 없이 접속하는 YouTube → MP3 웹 도구입니다. 웹 화면과 변환 처리를 같은 Render 무료 서버 하나에서 실행합니다.
 
 ## 접속 URL

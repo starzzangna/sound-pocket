@@ -97,7 +97,8 @@ def run(url, folder, bitrate, max_seconds):
     result = subprocess.run([ffmpeg, "-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-i", str(source),
                              "-vn", "-map_metadata", "-1", "-threads", "1", "-c:a", "libmp3lame",
                              "-b:a", f"{bitrate}k", "-t", str(max_seconds), str(folder / "audio.mp3")],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=780)
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, timeout=780,
+                            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
     if result.returncode:
         raise ValueError("MP3 인코딩에 실패했습니다. 다른 영상으로 다시 시도해 주세요.")
 

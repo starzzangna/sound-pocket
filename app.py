@@ -60,6 +60,7 @@ class ConversionManager:
         self.active = None
         self.lock = threading.RLock()
         self.stop = threading.Event()
+        self.runners = set()
         self.cleaner = threading.Thread(target=self._clean_loop, daemon=True)
         self.cleaner.start()
 
@@ -97,6 +98,8 @@ class ConversionManager:
     def create(self, url, bitrate):
         self.prune()
         with self.lock:
+            if self.stop.is_set():
+                raise ValueError("앱을 종료하고 있습니다.")
             if self.active:
                 raise ValueError("이미 변환 중입니다. 현재 작업이 끝난 뒤 다시 시도해 주세요.")
             # At most three completed MP3s plus a single active job.
@@ -113,15 +116,28 @@ class ConversionManager:
             self.jobs[ident] = job
             self.active = ident
             (self.root / ident).mkdir()
-            threading.Thread(target=self._run, args=(job, url), daemon=True).start()
+            runner = threading.Thread(target=self._run, args=(job, url), daemon=True)
+            self.runners.add(runner)
+            runner.start()
             return self.public(job)
+
+    def shutdown(self):
+        self.stop.set()
+        with self.lock:
+            for job in self.jobs.values():
+                if job['status'] not in TERMINAL:
+                    job['cancel'].set()
+            runners = list(self.runners)
+        for runner in runners:
+            runner.join(timeout=15)
+        return not any(runner.is_alive() for runner in runners)
 
     @staticmethod
     def terminate(proc):
         if proc.poll() is not None:
             return
         if os.name == "nt":
-            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True, check=False)
+            subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True, check=False, creationflags=subprocess.CREATE_NO_WINDOW)
         else:
             try:
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -135,10 +151,13 @@ class ConversionManager:
         error = None
         try:
             command = [sys.executable, str(BASE / "worker.py"), url, str(folder), str(job["bitrate"]), str(self.max_seconds)]
+            if getattr(sys, 'frozen', False):
+                command = [sys.executable, '--worker', url, str(folder), str(job['bitrate']), str(self.max_seconds)]
             with (folder / "events.ndjson").open("w", encoding="utf-8") as events:
                 worker_env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"}
                 # Sanitized worker diagnostics go to Render's private service logs.
-                proc = subprocess.Popen(command, stdout=events, stderr=None, env=worker_env, start_new_session=os.name != "nt")
+                proc = subprocess.Popen(command, stdout=events, stderr=None, env=worker_env, start_new_session=os.name != "nt",
+                                        creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
                 start, offset = time.monotonic(), 0
                 while True:
                     if job["cancel"].is_set():
@@ -204,6 +223,8 @@ class ConversionManager:
             for path in folder.iterdir():
                 if path.is_file() and (path.name != "audio.mp3" or job["status"] != "ready"):
                     path.unlink(missing_ok=True)
+            with self.lock:
+                self.runners.discard(threading.current_thread())
 
 
 def create_app(config=None):
@@ -226,6 +247,8 @@ def create_app(config=None):
 
     @app.before_request
     def protect():
+        if app.config.get('DESKTOP_MODE') and request.host.split(':')[0] != '127.0.0.1':
+            return jsonify(error='허용되지 않은 주소입니다.'), 403
         if not request.path.startswith("/api/"):
             return None
         if request.method == "POST":
@@ -263,7 +286,8 @@ def create_app(config=None):
         if "csrf" not in session:
             session["csrf"] = secrets.token_urlsafe(32)
         return jsonify(csrf=session["csrf"],
-                       max_minutes=manager.max_seconds // 60, retention_minutes=manager.ttl // 60)
+                       max_minutes=manager.max_seconds // 60, retention_minutes=manager.ttl // 60,
+                       desktop=bool(app.config.get('DESKTOP_MODE')))
 
     @app.get("/api/jobs")
     def latest():
