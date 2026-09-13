@@ -28,6 +28,19 @@ def ffmpeg_path():
 
 
 class AudioTests(unittest.TestCase):
+    def test_upstream_errors_are_distinguished(self):
+        for message, code in [("Sign in to confirm you're not a bot", 'bot_check'),
+                              ('HTTP Error 429', 'rate_limit'), ('missing PO Token', 'po_token'),
+                              ('HTTP Error 403', 'forbidden'), ('Video unavailable', 'unavailable')]:
+            self.assertEqual(worker.download_error(message)[0], code)
+
+    def test_diagnostics_redact_signed_urls_and_credentials(self):
+        with contextlib.redirect_stderr(io.StringIO()) as output:
+            worker.diagnostic('HTTP 403 https://example.com/audio?sig=secret cookie=secret po_token=secret')
+        self.assertIn('HTTP 403', output.getvalue())
+        self.assertNotIn('secret', output.getvalue())
+        self.assertNotIn('example.com', output.getvalue())
+
     @unittest.skipUnless(ffmpeg_path(), "FFmpeg is required for actual MP3 encoding")
     def test_synthetic_audio_is_encoded_and_decodable(self):
         with tempfile.TemporaryDirectory() as directory:
