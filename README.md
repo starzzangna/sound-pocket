@@ -1,103 +1,104 @@
 # Sound Pocket
 
-> 2026-09-13: Render 웹 서비스를 삭제하고 GitHub 앱/계정 권한과 Google 로그인 연결을 해제했습니다. 현재는 PC 앱으로 사용합니다. 아래 Render 배포 내용은 과거 기록입니다.
+YouTube 영상 주소를 입력해 **내 PC에 MP3를 저장하는 Windows 앱**입니다. 각 사용자의 PC에서 다운로드와 변환을 처리하므로 운영자의 PC나 별도 변환 서버가 필요하지 않습니다.
 
-## Windows PC 앱 (권장)
+- **Windows 10/11 64비트**용 실행 패키지
+- 앱 회원가입·로그인 없이 사용
+- Python, Node.js, FFmpeg가 포함된 ZIP 배포
+- 외부 변환 서버로 영상·MP3를 전송하지 않음
 
-각 사용자의 PC에서 직접 YouTube 다운로드와 MP3 변환을 처리하는 Windows 10/11 x64 앱입니다. Render로 영상·오디오를 전송하지 않으며 각자 PC의 인터넷을 사용합니다. Python, Node.js, FFmpeg는 실행 패키지에 포함됩니다. Microsoft Edge WebView2 Runtime이 필요합니다.
+## 빠른 시작
 
-1. `SoundPocket-Windows-x64.zip` 전체를 압축 해제합니다.
-2. `SoundPocket/SoundPocket.exe`를 실행합니다. `_internal` 폴더를 함께 두세요.
-3. 영상 주소를 입력하고 변환 후 **MP3 다운로드**를 눌러 저장 위치를 선택합니다.
+1. 배포받은 `SoundPocket-Windows-x64.zip`을 **전체 압축 해제**합니다.
+2. `SoundPocket` 폴더의 **`SoundPocket.exe`**를 실행합니다.
+3. YouTube 영상 주소를 붙여 넣고 MP3 음질을 선택합니다.
+4. **MP3로 변환하기**를 누릅니다.
+5. 완료되면 **MP3 다운로드**를 눌러 저장 위치를 선택합니다.
 
-앱을 닫으면 진행 중 작업이 취소되고 정상 종료 시 임시 파일을 정리합니다. 사용자가 따로 저장한 MP3는 삭제하지 않습니다. 앱이 실행되는 동안 임시 완료 파일은 15분 보관됩니다. 강제 종료 시에는 `%LOCALAPPDATA%\\SoundPocket`에 임시 파일이 남을 수 있습니다. 서버 비용과 앱 로그인은 없습니다. YouTube의 접근 제한을 영구적으로 해제하는 기능은 아닙니다.
-
-**실행 파일 검증:** 패키지에 포함된 Node.js와 FFmpeg를 사용해 공개 테스트 영상 `YE7VzlLtp-4`를 192kbps MP3(14,317,100바이트)로 변환하고, 로컬 HTTP 다운로드 및 전체 오디오 디코딩에 성공했습니다. 임시 작업 정리와 로컬 Host 검증·CSRF 거부도 확인했습니다.
-
-빌드 PC에서 재생성:
-
-```powershell
-python -m venv .venv
-.\\.venv\\Scripts\\python.exe -m pip install -r requirements-desktop.lock
-.\\.venv\\Scripts\\python.exe build_desktop.py
+```text
+SoundPocket/
+├── SoundPocket.exe
+├── _internal/       # 앱 실행에 필요한 구성요소
+├── licenses/        # 포함된 구성요소의 라이선스
+└── 사용방법.txt
 ```
 
-빌드 PC에는 Node.js가 필요합니다. 결과는 `dist/SoundPocket` 및 상위 `output/SoundPocket-Windows-x64.zip`입니다. 앱은 코드 서명되지 않았습니다. 구성요소 고지와 라이선스는 ZIP의 `licenses` 폴더에 포함합니다. 자세한 사용법은 `DESKTOP_README.txt`를 확인하세요.
+`SoundPocket.exe`만 옮기면 실행되지 않습니다. 다른 사람에게 공유할 때도 **ZIP 전체**를 전달하세요. GitHub의 **Code → Download ZIP**은 소스 코드이며, 실행 앱 패키지와 다릅니다. 실행 ZIP은 소스 저장소에 포함하지 않습니다.
 
-아래는 기존 Render 웹 서비스의 설정과 진단 기록입니다. 이 웹 주소에 접속하는 것만으로 PC 앱이 실행되지는 않습니다.
+자세한 사용법: [DESKTOP_README.txt](DESKTOP_README.txt)
 
-비밀번호 없이 접속하는 YouTube → MP3 웹 도구입니다. 웹 화면과 변환 처리를 같은 Render 무료 서버 하나에서 실행합니다.
+## 실행 환경
 
-## 접속 URL
-
-| 용도 | URL / 상태 |
+| 항목 | 조건 |
 | --- | --- |
-| 기존 웹사이트 | 서비스 종료 — Render 서비스 삭제 완료 |
-| 로컬 미리보기 | http://127.0.0.1:8765/ (이 PC에서만 접속 가능) |
-| Render 연동 | 해제 완료 — 현재 배포 서비스 없음 |
-| 비공개 소스 저장소 | [starzzangna/sound-pocket](https://github.com/starzzangna/sound-pocket) |
+| 운영체제 | Windows 10/11 x64 |
+| 인터넷 | YouTube 다운로드에 필요 |
+| 화면 실행 | Microsoft Edge WebView2 Runtime 필요 |
+| 별도 설치가 필요 없는 도구 | Python, Node.js, FFmpeg |
+| 비용 | 앱 구독·서버 비용 없음. 각 PC의 인터넷·전력을 사용 |
 
-## 현재 배포 상태 (2026-09-13)
+WebView2가 없는 PC는 [Microsoft 공식 페이지](https://developer.microsoft.com/microsoft-edge/webview2/)에서 설치할 수 있습니다. macOS·Linux 실행 파일은 현재 제공하지 않습니다.
 
-Render Singapore의 **Free** 웹 서비스로 배포했습니다. 비밀번호 없이 접속되며 페이지, 상태 확인, API, 정적 파일에서 HTTP 200 및 검색 제외 헤더를 확인했습니다.
+실행 파일은 코드 서명되지 않았습니다. Windows에서 게시자 확인 경고가 표시될 수 있으므로 배포받은 파일의 출처를 확인하세요.
 
-**현재 Render 서버에서는 YouTube 다운로드가 제한되어 실제 변환 테스트가 실패했습니다.** 공개 테스트 영상 `YE7VzlLtp-4`는 로컬에서 192kbps MP3 생성과 다운로드에 성공했지만, Render에서는 YouTube 요청 제한 오류가 발생했습니다. 사이트 배포는 완료되었으나 온라인 변환 기능의 정상 사용은 확인되지 않았습니다. 재시도만으로 해결된다고 보장할 수 없으며, 지속되면 변환 작업을 개인 PC에서 실행하는 등 실행 환경 변경이 필요합니다. 유료 프록시나 추가 유료 서비스는 연결하지 않았습니다.
+## 기능과 제한
 
-현재 서비스는 GitHub `main` 브랜치의 Dockerfile로 자동 배포됩니다. `/healthz` 상태 확인과 Render에서 생성한 `SECRET_KEY`를 사용합니다. README만 수정할 때 커밋 메시지에 `[skip render]`를 넣으면 불필요한 재배포를 건너뜁니다.
+| 항목 | 현재 지원 범위 |
+| --- | --- |
+| 입력 주소 | 일반 YouTube, youtu.be, Shorts, YouTube Music의 개별 영상 |
+| 출력 | MP3, 128 또는 192kbps |
+| 영상 길이 | 최대 30분 |
+| 동시 작업 | 앱 인스턴스당 한 개 |
+| 진행 상태 | 영상 확인 → 오디오 다운로드 → MP3 변환 |
+| 작업 취소 | 진행 중 취소 가능. 앱 종료 시 진행 중 작업도 종료 |
+| 임시 파일 | 완료 후 15분 보관. 새 작업 시작 시 오래된 완료 작업이 먼저 정리될 수 있음 |
+| 처리 한도 | 원본 최대 160MiB, 작업 폴더 약 220MiB, 작업 최대 15분 |
 
-### 원인 진단 결과 (2026-09-13 20:46 KST)
+로그인이 필요한 영상, 비공개 영상, 진행 중인 실시간 방송, 재생목록 전체 변환은 지원하지 않습니다. 결과 음질은 원본 음질에 영향을 받습니다.
 
-진단 수정본을 배포하고 같은 공개 영상을 한 번 재검증했습니다. Render 관리 로그에서 영상 정보 API의 `HTTP Error 403: Forbidden`과 최종 `Sign in to confirm you’re not a bot` 오류를 확인했습니다. 해당 실행에는 PO Token 누락 오류가 기록되지 않았습니다. 이는 봇 확인/인증 요구를 확인한 것이며 IP 평판만이 유일한 원인이라고 확정한 것은 아닙니다. 설치된 yt-dlp `2026.08.19`는 점검 시 공식 최신 안정 버전이며 Node.js도 인식됩니다.
+직접 제작했거나 다운로드·변환 권한이 있는 영상에 사용하세요. YouTube의 접근 제한이나 서비스 변경으로 변환이 실패할 수 있으며, PC 앱이 차단 해제를 보장하지는 않습니다. 로그인 쿠키 수집이나 유료 프록시 기능은 없습니다.
 
-다운로드 도구의 원본 경고·오류는 URL 및 인증정보를 가린 뒤 Render의 비공개 Application logs에 기록합니다. 방문자에게는 봇 확인, 요청량 제한, PO Token, HTTP 403, 영상 접근 불가를 구분한 안내를 표시합니다. 요청 사이 1초, 다운로드 시작 전 5~10초 간격을 추가했지만 이번 봇 확인 오류는 해소되지 않았습니다. 자동 테스트 13개가 통과했으며 온라인 MP3 변환은 여전히 실패 상태입니다. 기존 접속 주소와 무료 플랜은 유지합니다.
+## 파일 저장과 데이터 처리
 
-## 검색 노출 제외
+- **저장한 MP3:** 사용자가 선택한 폴더에 남으며 앱이 자동 삭제하지 않습니다.
+- **임시 MP3:** 앱이 실행되는 동안 15분 보관하며 정상 종료 시 정리합니다. 앱을 닫기 전에 저장하세요.
+- **앱 데이터:** 기본 위치는 `%LOCALAPPDATA%\SoundPocket`입니다. 실행 로그와 인스턴스별 임시 작업 폴더가 생성됩니다.
+- **강제 종료:** 임시 파일이 남을 수 있습니다. 수동 정리가 필요하면 모든 Sound Pocket 창을 닫은 뒤 해당 데이터 폴더의 `session-*` 폴더를 확인하세요.
 
-HTML의 `robots` 메타 태그와 모든 응답(페이지, API, MP3 파일, 오류 응답)의 `X-Robots-Tag` 헤더에 `noindex, nofollow, nosnippet, noarchive`를 적용합니다. `robots.txt`는 크롤러가 `noindex`를 읽을 수 있도록 접근을 허용합니다. 사이트맵이나 검색엔진 등록은 사용하지 않습니다.
+화면은 pywebview로 표시하고, 내부 Flask/Waitress 서비스는 `127.0.0.1`의 임의 포트에만 연결합니다. 외부에 공개되는 공유 URL은 없습니다. 앱 종료 후에는 내부 주소도 사용할 수 없습니다.
 
-로그인 없이 URL을 전달받아 사용하는 방식입니다. 검색 제외 지침은 이를 준수하는 검색엔진에 적용되며, 접속 권한을 인증하거나 URL의 재공유를 막지는 않습니다. README에 공유 주소를 기록하므로 GitHub 저장소는 **Private**으로 유지하세요.
+## 개발 환경에서 실행
 
-참고: [Google의 noindex 안내](https://developers.google.com/search/docs/crawling-indexing/block-indexing).
-
-## 기능
-
-- 로그인 없이 바로 주소 입력과 변환
-- 일반 YouTube / youtu.be / Shorts / YouTube Music 영상 주소 지원
-- 128 / 192kbps MP3, 최대 30분, 동시에 한 작업
-- 실제 다운로드 진행률, 인코딩 상태, 작업 취소, 새로고침 후 작업 복구
-- 완료 파일 15분 보관, 최대 3개 완료 파일 유지. 새 작업을 만들면 가장 오래된 완료 파일이 먼저 삭제될 수 있습니다.
-- 원본 최대 160MiB, 작업 폴더 최대 약 220MiB, 작업 최대 15분
-- 비공개·로그인 필요 영상, 진행 중인 실시간 방송, 재생목록 전체 변환 미지원
-
-자신이 제작했거나 다운로드·변환 권한이 있는 영상에 사용하세요. YouTube 공식 API를 사용하는 서비스는 아닙니다. YouTube 요청 제한 및 서비스 변경으로 일부 또는 전체 영상 다운로드가 실패할 수 있습니다. 우회 프록시, 사용자 쿠키 업로드 또는 로그인 정보 수집 기능은 없습니다.
-
-## Render에 배포
-
-1. 이 폴더의 소스 파일을 새 **비공개 GitHub 저장소**에 올립니다. `.venv`, `.runtime`, `.local.json`, `.env`는 올리지 않습니다.
-2. [Render 대시보드](https://dashboard.render.com/)에서 **New → Blueprint**를 선택하고 해당 저장소를 연결합니다.
-3. `render.yaml`의 웹 서비스가 **Free**, 지역이 Singapore인지 확인합니다. 유료 데이터베이스나 디스크는 만들지 않습니다.
-4. 요청 위조 방지용 세션 서명 키는 자동 생성됩니다. 접속 비밀번호는 설정하지 않습니다.
-5. 배포 후 표시되는 `https://…onrender.com` 주소에 접속합니다. 이 주소를 전달하면 비밀번호 없이 사용할 수 있습니다.
-6. 실제 서버에서 권한이 있는 짧은 영상을 먼저 변환해 MP3 다운로드까지 확인합니다. 로컬 성공만으로 Render의 YouTube 접근 성공을 보장할 수 없습니다.
-
-별도 도메인 구매는 필요하지 않습니다. 결제수단을 등록하지 않고 무료 플랜을 유지하면 한도 초과 시 서비스 중지 방식으로 운영할 수 있습니다. 결제수단이 이미 연결된 계정은 초과 과금 정책을 먼저 확인하세요. 이 앱은 Render의 월간 계정 사용량을 조회하거나 과금을 강제로 차단하지 않습니다.
-
-무료 서버는 15분간 요청이 없으면 절전하며 첫 접속에 약 1분이 걸릴 수 있습니다. 절전·재시작 시 파일과 작업 상태가 사라집니다. 진행 중일 때는 화면을 열어 두세요. 무료 서버의 실제 성능·메모리 한도에서 변환 성공 여부는 배포 후 확인해야 합니다.
-
-## Windows 로컬 실행
-
-Python 3.12 이상과 Node.js 22 이상을 설치한 뒤 이 폴더에서:
+빌드·개발 PC에는 **Python 3.12 x64와 Node.js**가 필요합니다. 검증에 사용한 Node.js 버전은 `26.7.0`입니다. 저장소 루트에서 다음 명령을 실행하세요.
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.lock
-.\.venv\Scripts\python.exe -m pip install imageio-ffmpeg==0.6.0
+.\.venv\Scripts\python.exe -m pip install -r requirements-desktop.lock
+.\.venv\Scripts\python.exe desktop.py
+```
+
+개발용 브라우저 미리보기도 실행할 수 있습니다.
+
+```powershell
 .\.venv\Scripts\python.exe start_local.py
 ```
 
-브라우저에서 `http://127.0.0.1:8765`를 엽니다. 비밀번호 없이 바로 변환 화면이 열립니다. `.local.json`에는 요청 위조 방지용 서명 키가 저장되므로 공유하지 마세요. 로컬 서버는 본인 컴퓨터에서만 접속할 수 있습니다.
+이 경우에만 [http://127.0.0.1:8765](http://127.0.0.1:8765)를 사용합니다. 개발용 `.local.json`에는 세션 서명 키가 들어 있으므로 공유하거나 커밋하지 마세요.
 
-Linux에서는 FFmpeg와 Node.js를 설치하고 `SECRET_KEY`를 환경변수로 설정한 뒤 `python serve.py`로 실행합니다. 기본 쿠키는 HTTPS 전용입니다. 로컬 HTTP에서만 `COOKIE_SECURE=false`를 사용하세요.
+## Windows 실행 패키지 만들기
+
+개발 환경을 설치한 뒤, 실행 중인 배포 앱을 닫고 다음 명령을 실행합니다.
+
+```powershell
+.\.venv\Scripts\python.exe build_desktop.py
+```
+
+| 결과물 | 위치 — 저장소 루트 기준 |
+| --- | --- |
+| 실행 앱 폴더 | `dist/SoundPocket/` |
+| 공유용 ZIP | `../output/SoundPocket-Windows-x64.zip` |
+
+PyInstaller가 Python과 앱 의존성을 묶고, 빌드 PC의 Node.js 실행 파일과 imageio-ffmpeg의 FFmpeg를 포함합니다. Node.js 버전을 변경한다면 함께 배포하는 `NODE_LICENSE.txt`도 해당 버전에 맞게 확인하세요. 구성요소 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 참고하세요.
 
 ## 검증
 
@@ -106,12 +107,46 @@ Linux에서는 FFmpeg와 Node.js를 설치하고 `SECRET_KEY`를 환경변수로
 node --check static/app.js
 ```
 
-자동 검증은 비밀번호 없는 접근, CSRF 방어, URL 검증, 동시 작업 제한, 취소·시간초과, 스트리밍 다운로드 및 만료를 확인합니다. 오디오 테스트는 자체 생성한 테스트 톤을 실제 FFmpeg로 MP3 인코딩합니다. 이 테스트는 YouTube 네트워크 다운로드를 대신 검증하지 않습니다.
+완성된 실행 파일 자체를 검증하려면, 저장소 루트에서 다음 명령을 실행합니다.
 
-## 유지보수
+```powershell
+New-Item -ItemType Directory -Force artifacts | Out-Null
+Start-Process -FilePath '.\dist\SoundPocket\SoundPocket.exe' -ArgumentList '--data-dir artifacts\smoke-data --smoke-test artifacts\desktop-smoke.json' -Wait
+Get-Content artifacts\desktop-smoke.json
+```
 
-서버는 반드시 **하나의 Python 프로세스**로 실행하세요. 작업 상태는 메모리에 저장되므로 여러 프로세스로 늘리면 안 됩니다. Waitress의 스레드 4개는 하나의 프로세스에서 동작합니다. 재시작 전의 오래된 임시 디렉터리도 정리합니다.
+기본 실행 파일 검증은 로컬 HTTP 응답, Host 검사, CSRF 방어, 포함된 Node.js 실행, 실제 FFmpeg 인코딩, 임시 작업 정리를 확인합니다. YouTube 다운로드까지 검증하려면 `-ArgumentList` 문자열 끝에 `--test-video <권한이 있는 공개 영상 URL>`을 추가하세요.
 
-`requirements.lock`은 검증 당시 버전입니다. YouTube 변경으로 실패하기 시작하면 `yt-dlp[default]`를 업데이트한 후 검증하고 잠금 파일을 다시 생성해 재배포하세요. 임의의 외부 변환 API나 유료 프록시는 연결하지 않았습니다.
+**2026-09-13 검증 결과:** 자동 테스트 13개 통과. 완성된 Windows 실행 파일에서 공개 테스트 영상 `YE7VzlLtp-4`를 192kbps MP3 **14,317,100바이트**로 변환하고, 다운로드한 파일 전체를 디코딩하는 데 성공했습니다. 이후 PC용 입력 화면과 변환 완료·다운로드 표시도 확인했습니다. 이 결과가 모든 영상이나 다른 PC의 YouTube 접근 성공을 보장하지는 않습니다.
 
-참고: [Render 무료 한도](https://render.com/docs/free), [Blueprint 설정](https://render.com/docs/blueprint-spec), [yt-dlp](https://github.com/yt-dlp/yt-dlp).
+## 문제 해결
+
+| 증상 | 확인할 내용 |
+| --- | --- |
+| 앱이 열리지 않음 | ZIP 전체 압축 해제 여부, `_internal` 폴더, WebView2 설치 여부 |
+| 연결 오류 | 앱을 다시 실행. 일반 PC 앱에 고정된 `8765` 주소를 사용하지 않음 |
+| 봇 확인·HTTP 403 | YouTube가 해당 PC의 요청을 거부한 상태. 반복 요청을 멈추고 브라우저에서 영상 접근 상태 확인 |
+| HTTP 429 | 요청 횟수 제한. 연속 변환을 멈추고 나중에 재시도 |
+| 검증 토큰 관련 오류 | 다운로드 도구와 YouTube 검증 설정 점검 필요 |
+| 다운로드 버튼 만료 | 임시 파일 보관 시간 경과 또는 앱 종료. 다시 변환 필요 |
+
+YouTube 변경에 대응해 다운로드 도구를 업데이트할 때는 `requirements-desktop.lock`을 함께 갱신하고, 테스트와 실행 파일 검증 후 **ZIP을 다시 빌드·배포**하세요. 소스만 수정해도 이미 전달한 앱이 자동 업데이트되지는 않습니다.
+
+## 주요 파일
+
+| 파일 | 역할 |
+| --- | --- |
+| `desktop.py` | PC 앱 창, 로컬 서비스, 실행 도구 설정 및 종료 처리 |
+| `app.py` | 작업 관리, 진행 상태, 취소, MP3 다운로드 API |
+| `worker.py` | yt-dlp 다운로드와 FFmpeg 변환 |
+| `static/` | 공통 변환 화면과 스타일 |
+| `build_desktop.py` | Windows 실행 폴더 및 공유 ZIP 생성 |
+| `desktop_smoke.py` | 패키지 안에서 실행하는 검증 |
+| `requirements-desktop.lock` | PC 앱·빌드 환경 의존성 버전 |
+| `tests/` | API·작업 관리·오디오·오류 처리 테스트 |
+
+## 기존 웹 서비스 종료
+
+Render 기반 웹 서비스는 PC 앱으로 전환하면서 종료했습니다. 배포 서비스와 GitHub·Google 연동을 해제했고 Render 계정도 탈퇴했습니다. **현재 운영 중인 Render 사이트나 자동 배포 연결은 없습니다.** GitHub 비공개 저장소는 소스 보관용으로 유지합니다.
+
+`Dockerfile`, `render.yaml`, `serve.py`, `requirements.lock`은 이전 웹 서버 구성 파일로 남아 있으며, 현재 PC 앱 실행에는 필요하지 않습니다.
