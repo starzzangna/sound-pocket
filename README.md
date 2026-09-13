@@ -1,5 +1,7 @@
 # Sound Pocket
 
+> 2026-09-13: Render 웹 서비스를 삭제하고 GitHub 앱/계정 권한과 Google 로그인 연결을 해제했습니다. 현재는 PC 앱으로 사용합니다. 아래 Render 배포 내용은 과거 기록입니다.
+
 ## Windows PC 앱 (권장)
 
 각 사용자의 PC에서 직접 YouTube 다운로드와 MP3 변환을 처리하는 Windows 10/11 x64 앱입니다. Render로 영상·오디오를 전송하지 않으며 각자 PC의 인터넷을 사용합니다. Python, Node.js, FFmpeg는 실행 패키지에 포함됩니다. Microsoft Edge WebView2 Runtime이 필요합니다.
@@ -30,9 +32,9 @@ python -m venv .venv
 
 | 용도 | URL / 상태 |
 | --- | --- |
-| 외부 공유용 사이트 | [https://sound-pocket.onrender.com](https://sound-pocket.onrender.com) |
+| 기존 웹사이트 | 서비스 종료 — Render 서비스 삭제 완료 |
 | 로컬 미리보기 | http://127.0.0.1:8765/ (이 PC에서만 접속 가능) |
-| 배포 관리 | [Render 서비스 관리](https://dashboard.render.com/web/srv-daj8fe8jo6nc73cs8pqg) |
+| Render 연동 | 해제 완료 — 현재 배포 서비스 없음 |
 | 비공개 소스 저장소 | [starzzangna/sound-pocket](https://github.com/starzzangna/sound-pocket) |
 
 ## 현재 배포 상태 (2026-09-13)
