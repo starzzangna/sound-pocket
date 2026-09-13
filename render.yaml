@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: sound-pocket
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /healthz
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: COOKIE_SECURE
+        value: "true"

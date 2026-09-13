@@ -1,0 +1,10 @@
+.git
+.venv
+.deps
+.runtime
+.local.json
+.env
+__pycache__
+artifacts
+tests
+*.log
