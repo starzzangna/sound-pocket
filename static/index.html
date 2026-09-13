@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, nosnippet, noarchive">
+  <meta name="theme-color" content="#f6f7fb"><meta name="description" content="YouTube 영상에서 필요한 소리를 MP3로 저장하는 개인용 변환 도구.">
+  <title>Sound Pocket · MP3 변환</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg"><link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar"><a class="brand" href="/" aria-label="Sound Pocket 홈"><img src="/static/favicon.svg" alt="" width="34" height="34">sound pocket<span class="brand-period">.</span></a><div class="top-actions"><span class="private-label">YOUTUBE TO MP3</span></div></header>
+    <main>
+      <section class="intro"><p class="eyebrow">YOUR LITTLE AUDIO SPACE</p><h1>듣고 싶은 소리,<br><span>가볍게 담아두세요.</span></h1><p class="intro-copy">YouTube 주소 하나로, 필요한 오디오를 MP3로.</p></section>
+      <section id="connection" class="connection" aria-live="polite">접속 상태를 확인하고 있어요…</section>
+      <section id="workspace" hidden aria-label="오디오 변환">
+        <div class="converter-card"><div class="card-heading"><div><span class="small-label">YOUTUBE TO MP3</span><h2>어떤 소리를 담을까요?</h2></div><span class="format-badge">.mp3</span></div>
+          <form id="convert-form"><label for="video-url">YouTube 영상 주소</label><div class="url-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m10 13 4-4m-6 6-2 2a4 4 0 0 1-6-6l4-4a4 4 0 0 1 6 0m4 2 2-2a4 4 0 0 1 6 6l-4 4a4 4 0 0 1-6 0" transform="translate(1 0)"/></svg><input id="video-url" name="url" type="text" inputmode="url" autocomplete="off" spellcheck="false" maxlength="2048" placeholder="https://www.youtube.com/watch?v=…" required><button id="paste" type="button" class="paste-button">붙여넣기</button></div>
+          <div class="settings-row"><fieldset><legend>MP3 음질</legend><div class="quality-options"><label class="quality"><input type="radio" name="bitrate" value="128"><span>128 <small>kbps</small></span></label><label class="quality"><input type="radio" name="bitrate" value="192" checked><span>192 <small>kbps</small><em>추천</em></span></label></div></fieldset><p class="setting-note">원본 음질에 따라 결과가 달라져요.</p></div>
+          <button class="primary convert-button" id="convert-button" type="submit">MP3로 변환하기 <span aria-hidden="true">→</span></button><p id="form-error" class="error-text" role="alert"></p>
+          </form><div class="limits"><span>최대 <b id="max-minutes">30</b>분 영상</span><span>한 번에 1개</span><span><b id="retention-minutes">15</b>분 후 파일 삭제</span></div>
+        </div>
+        <section id="job-panel" class="job-panel" hidden aria-live="polite" aria-atomic="true"><div class="job-top"><span id="job-label" class="small-label">변환 중</span><button id="cancel" class="text-button" type="button">취소</button></div><h3 id="job-title"></h3><div id="progress-region"><div class="progress-track"><progress id="progress" max="100" aria-label="오디오 다운로드 진행률"></progress></div><div class="progress-details"><span id="stage-text"></span><span id="progress-text"></span></div><ol class="stages" aria-label="변환 단계"><li>영상 확인</li><li>오디오 받기</li><li>MP3 변환</li></ol></div><p id="job-message"></p><a id="download" class="primary download-button" hidden>MP3 다운로드 <span aria-hidden="true">↓</span></a><p id="expiry" class="expiry" hidden></p></section>
+        <p class="usage-note">직접 제작했거나 다운로드·변환 권한이 있는 영상을 사용해 주세요.</p>
+      </section>
+    </main>
+    <footer><span>작은 파일에 담는, 나만의 사운드.</span><span>SOUND POCKET © 2026</span></footer>
+  </div>
+</body>
+</html>
