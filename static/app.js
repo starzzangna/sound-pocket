@@ -1,6 +1,7 @@
 "use strict";
 const $ = (id) => document.getElementById(id);
 let csrf = "", timer = null, currentJob = null, networkFailures = 0;
+let desktopMode = false;
 const terminal = new Set(["ready", "error", "cancelled"]);
 
 async function api(path, options = {}) {
@@ -18,13 +19,20 @@ async function boot() {
   $("connection").hidden = false;
   try {
     const data = await api("/api/session"); csrf = data.csrf;
+    desktopMode = data.desktop === true;
+    if (desktopMode) {
+      document.querySelector('.private-label').textContent = '내 PC에서 변환';
+      document.querySelector('.intro-copy').textContent = 'YouTube 주소 하나로, 이 PC에 MP3를 저장하세요.';
+      document.querySelector('footer span:first-child').textContent = '이 PC에서 처리 · 외부 변환 서버 전송 없음';
+    }
     $("max-minutes").textContent = data.max_minutes;
     $("retention-minutes").textContent = data.retention_minutes;
+    if (desktopMode) document.querySelector('.limits span:last-child').lastChild.textContent = '분 후 임시 파일 삭제';
     $("connection").hidden = true;
     await showWorkspace();
   } catch {
     $("connection").hidden = false;
-    $("connection").textContent = "서버를 깨우고 있어요. 무료 서버는 첫 접속에 약 1분이 걸릴 수 있습니다.";
+    $("connection").textContent = "연결하지 못했습니다. 앱을 사용 중이면 다시 실행하고, 웹사이트에서는 잠시 후 다시 연결해 주세요.";
     const retry = document.createElement("button"); retry.className = "text-button"; retry.textContent = "다시 연결"; retry.addEventListener("click", boot); $("connection").append(document.createElement("br"), retry);
   }
 }
@@ -50,7 +58,7 @@ function renderJob(job) {
   if (job.status === "ready") {
     $("download").href = `/api/jobs/${job.id}/download`;
     const expires = new Date(job.expires_at * 1000).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
-    $("expiry").textContent = `${job.bitrate}kbps · ${(job.size / 1024 / 1024).toFixed(1)}MB · ${expires}까지 다운로드할 수 있어요. 서버 재시작 시 더 일찍 삭제될 수 있습니다.`;
+    $("expiry").textContent = `${job.bitrate}kbps · ${(job.size / 1024 / 1024).toFixed(1)}MB · ${expires}까지 다운로드할 수 있어요. ` + (desktopMode ? '앱을 닫기 전에 저장하세요. 저장한 MP3는 자동 삭제되지 않습니다.' : '서버 재시작 시 더 일찍 삭제될 수 있습니다.');
     clearTimeout(timer); timer = setTimeout(() => { $("download").hidden = true; $("expiry").textContent = "파일 보관 시간이 지났습니다. 주소를 입력해 다시 변환해 주세요."; }, Math.max(0, job.expires_at * 1000 - Date.now()));
   }
 }
