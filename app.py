@@ -135,9 +135,10 @@ class ConversionManager:
         error = None
         try:
             command = [sys.executable, str(BASE / "worker.py"), url, str(folder), str(job["bitrate"]), str(self.max_seconds)]
-            with (folder / "events.ndjson").open("w", encoding="utf-8") as events, (folder / "errors.log").open("w", encoding="utf-8") as errors:
+            with (folder / "events.ndjson").open("w", encoding="utf-8") as events:
                 worker_env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUNBUFFERED": "1"}
-                proc = subprocess.Popen(command, stdout=events, stderr=errors, env=worker_env, start_new_session=os.name != "nt")
+                # Sanitized worker diagnostics go to Render's private service logs.
+                proc = subprocess.Popen(command, stdout=events, stderr=None, env=worker_env, start_new_session=os.name != "nt")
                 start, offset = time.monotonic(), 0
                 while True:
                     if job["cancel"].is_set():
